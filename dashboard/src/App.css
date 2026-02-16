@@ -1,0 +1,110 @@
+/* ── App Layout ──────────────────────────────────────────────────────────── */
+.app-layout {
+  display: flex;
+  height: 100vh;
+  overflow: hidden;
+}
+
+.main-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  background: var(--bg0);
+}
+
+/* ── Top bar ─────────────────────────────────────────────────────────────── */
+.topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 24px;
+  border-bottom: 1px solid var(--border);
+  background: var(--bg1);
+  flex-shrink: 0;
+}
+
+.topbar-left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.page-title {
+  font-family: var(--sans);
+  font-size: 17px;
+  font-weight: 600;
+  color: var(--text-1);
+  letter-spacing: 0.5px;
+}
+
+.demo-chip {
+  font-size: 9px;
+  letter-spacing: 2px;
+  padding: 2px 8px;
+  border-radius: var(--radius);
+  background: rgba(251, 191, 36, 0.15);
+  border: 1px solid rgba(251, 191, 36, 0.3);
+  color: var(--yellow);
+}
+
+.topbar-right {
+  font-size: 12px;
+  color: var(--text-3);
+  letter-spacing: 1px;
+}
+
+/* ── Queue section ───────────────────────────────────────────────────────── */
+.queue-section {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.queue-body {
+  flex: 1;
+  display: flex;
+  overflow: hidden;
+}
+
+/* ── Coming Soon ─────────────────────────────────────────────────────────── */
+.coming-soon {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  color: var(--text-3);
+  padding: 60px 20px;
+}
+
+.cs-icon  {
+  font-size: 48px;
+  opacity: 0.15;
+  animation: pulse-dot 4s infinite;
+}
+
+.cs-title {
+  font-size: 22px;
+  font-weight: 600;
+  color: var(--text-2);
+  letter-spacing: 1px;
+}
+
+.cs-sub {
+  font-size: 12px;
+  color: var(--text-3);
+  letter-spacing: 1px;
+}
+
+.cs-badge {
+  font-size: 9px;
+  letter-spacing: 3px;
+  padding: 4px 14px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  color: var(--text-3);
+  margin-top: 8px;
+}

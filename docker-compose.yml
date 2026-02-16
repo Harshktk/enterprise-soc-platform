@@ -1,0 +1,169 @@
+version: "3.9"
+
+# ──────────────────────────────────────────────────────────────
+#  Enterprise SOC Platform — Local Dev Stack
+#  Starts: Kafka, Zookeeper, TimescaleDB, API, Dashboard
+# ──────────────────────────────────────────────────────────────
+
+networks:
+  soc-net:
+    driver: bridge
+
+volumes:
+  timescale-data:
+  kafka-data:
+  zookeeper-data:
+  zookeeper-log:
+
+services:
+
+  # ── ZooKeeper (required by Kafka) ─────────────────────────
+  zookeeper:
+    image: confluentinc/cp-zookeeper:7.5.0
+    container_name: soc-zookeeper
+    networks: [soc-net]
+    environment:
+      ZOOKEEPER_CLIENT_PORT: 2181
+      ZOOKEEPER_TICK_TIME: 2000
+    volumes:
+      - zookeeper-data:/var/lib/zookeeper/data
+      - zookeeper-log:/var/lib/zookeeper/log
+    healthcheck:
+      test: echo srvr | nc localhost 2181 | grep Mode
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # ── Kafka Broker ──────────────────────────────────────────
+  kafka:
+    image: confluentinc/cp-kafka:7.5.0
+    container_name: soc-kafka
+    networks: [soc-net]
+    depends_on:
+      zookeeper:
+        condition: service_healthy
+    ports:
+      - "9092:9092"
+      - "9093:9093"      # External access
+    environment:
+      KAFKA_BROKER_ID: 1
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,EXTERNAL:PLAINTEXT
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:29092,EXTERNAL://localhost:9092
+      KAFKA_LISTENERS: PLAINTEXT://0.0.0.0:29092,EXTERNAL://0.0.0.0:9092
+      KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
+      KAFKA_AUTO_CREATE_TOPICS_ENABLE: "true"
+      KAFKA_DEFAULT_REPLICATION_FACTOR: 1
+      KAFKA_NUM_PARTITIONS: 3
+      KAFKA_LOG_RETENTION_HOURS: 168       # 7 days
+      KAFKA_LOG_SEGMENT_BYTES: 1073741824
+      KAFKA_LOG_RETENTION_CHECK_INTERVAL_MS: 300000
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
+      KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
+    volumes:
+      - kafka-data:/var/lib/kafka/data
+    healthcheck:
+      test: kafka-topics --bootstrap-server localhost:9092 --list
+      interval: 15s
+      timeout: 10s
+      retries: 5
+
+  # ── Kafka UI (dev convenience) ────────────────────────────
+  kafka-ui:
+    image: provectuslabs/kafka-ui:latest
+    container_name: soc-kafka-ui
+    networks: [soc-net]
+    depends_on:
+      kafka:
+        condition: service_healthy
+    ports:
+      - "8080:8080"
+    environment:
+      KAFKA_CLUSTERS_0_NAME: soc-cluster
+      KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS: kafka:29092
+      KAFKA_CLUSTERS_0_READONLY: "false"
+
+  # ── TimescaleDB (PostgreSQL + time-series) ────────────────
+  timescaledb:
+    image: timescale/timescaledb:latest-pg15
+    container_name: soc-timescaledb
+    networks: [soc-net]
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_DB: socdb
+      POSTGRES_USER: soc
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-soc_password}
+    volumes:
+      - timescale-data:/var/lib/postgresql/data
+      - ./infra/init.sql:/docker-entrypoint-initdb.d/init.sql:ro
+    healthcheck:
+      test: pg_isready -U soc -d socdb
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # ── SOC API (FastAPI) ──────────────────────────────────────
+  api:
+    build:
+      context: .
+      dockerfile: infra/Dockerfile.api
+    container_name: soc-api
+    networks: [soc-net]
+    depends_on:
+      timescaledb:
+        condition: service_healthy
+      kafka:
+        condition: service_healthy
+    ports:
+      - "8000:8000"
+    environment:
+      SPLUNK_PASSWORD: ${SPLUNK_PASSWORD:-changeme}
+      QRADAR_API_TOKEN: ${QRADAR_API_TOKEN:-changeme}
+      WAZUH_PASSWORD: ${WAZUH_PASSWORD:-changeme}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-soc_password}
+    volumes:
+      - .:/app
+    command: uvicorn api.main:app --host 0.0.0.0 --port 8000 --reload
+    healthcheck:
+      test: curl -f http://localhost:8000/api/health || exit 1
+      interval: 15s
+      timeout: 5s
+      retries: 5
+
+  # ── Normalizer Worker ─────────────────────────────────────
+  normalizer:
+    build:
+      context: .
+      dockerfile: infra/Dockerfile.api
+    container_name: soc-normalizer
+    networks: [soc-net]
+    depends_on:
+      timescaledb:
+        condition: service_healthy
+      kafka:
+        condition: service_healthy
+    environment:
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-soc_password}
+    volumes:
+      - .:/app
+    command: python -m pipeline.normalizer.worker
+
+  # ── Dashboard (React dev server) ──────────────────────────
+  dashboard:
+    image: node:20-alpine
+    container_name: soc-dashboard
+    networks: [soc-net]
+    depends_on:
+      - api
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./dashboard:/app
+    working_dir: /app
+    command: sh -c "npm install && npm start"
+    environment:
+      REACT_APP_API_URL: http://localhost:8000
+      REACT_APP_WS_URL: ws://localhost:8000/ws/alerts
+      CHOKIDAR_USEPOLLING: "true"

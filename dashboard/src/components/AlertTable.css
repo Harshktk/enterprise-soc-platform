@@ -1,0 +1,159 @@
+.alert-table-wrap {
+  overflow-x: auto;
+  overflow-y: auto;
+  flex: 1;
+}
+
+.alert-table {
+  width: 100%;
+  border-collapse: collapse;
+  table-layout: fixed;
+}
+
+.alert-table thead th {
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: 2px;
+  color: var(--text-3);
+  text-align: left;
+  padding: 10px 14px;
+  border-bottom: 1px solid var(--border);
+  background: var(--bg1);
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  white-space: nowrap;
+}
+
+/* Severity row left-border accent */
+.alert-row {
+  border-bottom: 1px solid var(--border);
+  cursor: pointer;
+  transition: background 0.1s;
+  animation: fadeIn 0.3s ease both;
+  border-left: 3px solid transparent;
+}
+.alert-row:hover     { background: var(--bg3); }
+.alert-row.selected  { background: var(--bg3); border-left-color: var(--cyan); }
+.alert-row.is-new    { }
+
+.alert-row.sev-5 { border-left-color: var(--red); }
+.alert-row.sev-4 { border-left-color: var(--orange); }
+.alert-row.sev-3 { border-left-color: var(--yellow); }
+.alert-row.sev-2 { border-left-color: var(--green); }
+.alert-row.sev-1 { border-left-color: var(--cyan); }
+
+.alert-row td {
+  padding: 9px 14px;
+  vertical-align: middle;
+  font-size: 13px;
+}
+
+/* Severity badge */
+.sev-badge {
+  font-size: 10px;
+  font-weight: 600;
+  padding: 2px 7px;
+  border-radius: var(--radius);
+  letter-spacing: 1px;
+  white-space: nowrap;
+}
+
+/* SIEM tag */
+.siem-tag {
+  font-size: 10px;
+  letter-spacing: 1px;
+  padding: 2px 7px;
+  border-radius: var(--radius);
+  border: 1px solid;
+  white-space: nowrap;
+}
+
+/* Title column */
+.alert-title {
+  color: var(--text-1);
+  font-weight: 500;
+  font-size: 13px;
+  max-width: 340px;
+  display: flex;
+  align-items: center;
+  gap: 7px;
+}
+
+.new-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--cyan);
+  flex-shrink: 0;
+  animation: pulse-dot 2s infinite;
+}
+
+.alert-mitre {
+  font-size: 10px;
+  color: var(--purple);
+  margin-top: 3px;
+  letter-spacing: 0.5px;
+}
+
+/* IP */
+.ip-text {
+  font-size: 11px;
+  color: var(--text-2);
+}
+
+/* Status button */
+.status-btn {
+  font-size: 10px;
+  letter-spacing: 1px;
+  padding: 3px 8px;
+  border-radius: var(--radius);
+  border: none;
+  cursor: pointer;
+  font-weight: 600;
+  white-space: nowrap;
+  transition: opacity 0.15s;
+}
+.status-btn:hover:not(:disabled) { opacity: 0.8; }
+.status-btn:disabled { cursor: default; opacity: 0.7; }
+
+/* Risk bar */
+.risk-bar-wrap {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.risk-bar {
+  height: 3px;
+  width: 0%;
+  border-radius: 2px;
+  transition: width 0.4s ease;
+  max-width: 40px;
+  min-width: 0;
+}
+.risk-label {
+  font-size: 11px;
+  color: var(--text-2);
+  min-width: 24px;
+}
+
+/* Time */
+.time-text { font-size: 11px; color: var(--text-3); }
+
+/* Arrow */
+.row-arrow { font-size: 16px; transition: color 0.15s; }
+
+/* Empty state */
+.alert-empty {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  padding: 80px 20px;
+  color: var(--text-3);
+}
+.empty-icon  { font-size: 40px; opacity: 0.2; animation: pulse-dot 3s infinite; }
+.empty-text  { font-size: 12px; letter-spacing: 3px; }
+.empty-sub   { font-size: 13px; color: var(--text-3); }

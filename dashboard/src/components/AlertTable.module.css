@@ -1,0 +1,198 @@
+.container {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.toolbar {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 16px;
+  border-bottom: 1px solid var(--border);
+  flex-shrink: 0;
+  flex-wrap: wrap;
+}
+
+.searchWrap {
+  position: relative;
+  flex: 1;
+  min-width: 180px;
+}
+.searchIcon {
+  position: absolute; left: 10px; top: 50%;
+  transform: translateY(-50%);
+  color: var(--text-dim);
+  font-size: 15px;
+  pointer-events: none;
+}
+.search {
+  width: 100%;
+  background: var(--bg3);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  color: var(--text);
+  font-family: var(--font-mono);
+  font-size: 11px;
+  padding: 6px 30px 6px 30px;
+  outline: none;
+  transition: border-color 0.15s;
+}
+.search:focus { border-color: var(--border2); }
+.search::placeholder { color: var(--text-muted); }
+.clearSearch {
+  position: absolute; right: 8px; top: 50%;
+  transform: translateY(-50%);
+  font-size: 10px;
+  color: var(--text-dim);
+  padding: 2px 4px;
+}
+.clearSearch:hover { color: var(--text); }
+
+.filters { display: flex; align-items: center; gap: 8px; }
+.filterLabel {
+  font-family: var(--font-mono);
+  font-size: 9px;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  color: var(--text-dim);
+}
+.select {
+  background: var(--bg3);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  color: var(--text);
+  font-family: var(--font-mono);
+  font-size: 10px;
+  padding: 5px 8px;
+  outline: none;
+  cursor: pointer;
+}
+.select:focus { border-color: var(--border2); }
+
+.count { margin-left: auto; display: flex; align-items: baseline; gap: 3px; }
+.countNum { font-family: var(--font-mono); font-size: 16px; font-weight: 600; color: var(--cyan); }
+.countOf  { font-family: var(--font-mono); font-size: 11px; color: var(--text-dim); }
+
+/* Table */
+.tableWrap {
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: auto;
+}
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  table-layout: fixed;
+}
+
+.th {
+  font-family: var(--font-mono);
+  font-size: 9px;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  color: var(--text-muted);
+  text-align: left;
+  padding: 8px 12px;
+  background: var(--bg2);
+  border-bottom: 1px solid var(--border);
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  cursor: pointer;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  user-select: none;
+}
+.th:hover { color: var(--text-dim); }
+.thActive { color: var(--cyan) !important; }
+.sortArrow { font-size: 10px; }
+
+.row {
+  cursor: pointer;
+  transition: background 0.1s;
+  border-bottom: 1px solid var(--border);
+}
+.row:hover { background: var(--bg3); }
+.rowSelected { background: rgba(0,212,255,0.06) !important; outline: 1px solid rgba(0,212,255,0.2); outline-offset: -1px; }
+.rowNew { animation: newFlash 1.2s ease-out; }
+@keyframes newFlash {
+  0%   { background: rgba(0,212,255,0.18); }
+  100% { background: transparent; }
+}
+.rowCritical { border-left: 2px solid var(--red); }
+
+.td {
+  padding: 9px 12px;
+  vertical-align: middle;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.tdTitle { overflow: visible; }
+
+.timeMain {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--text);
+}
+.timeAgo {
+  font-family: var(--font-mono);
+  font-size: 9px;
+  color: var(--text-dim);
+  margin-top: 1px;
+}
+
+.titleText {
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 320px;
+}
+.titleSub {
+  font-family: var(--font-mono);
+  font-size: 9px;
+  color: var(--text-dim);
+  margin-top: 2px;
+}
+
+.ip {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--text-dim);
+}
+
+.techId {
+  font-family: var(--font-mono);
+  font-size: 9px;
+  font-weight: 600;
+  color: var(--cyan);
+}
+.techName {
+  font-family: var(--font-mono);
+  font-size: 9px;
+  color: var(--text-dim);
+  margin-top: 1px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.noTech {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--text-muted);
+}
+
+.empty {
+  text-align: center;
+  padding: 60px 20px;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.1em;
+  color: var(--text-muted);
+}

@@ -1,0 +1,53 @@
+# ─────────────────────────────────────────────
+#  Enterprise SOC Platform — Main Config
+# ─────────────────────────────────────────────
+
+kafka:
+  bootstrap_servers: "localhost:9092"
+  topics:
+    splunk_raw: "raw.splunk.alerts"
+    qradar_raw: "raw.qradar.alerts"
+    wazuh_raw:  "raw.wazuh.alerts"
+    normalized: "normalized.alerts"
+    dead_letter: "dead.letter"
+  consumer_group: "soc-normalizer-group"
+  auto_offset_reset: "earliest"
+
+database:
+  url: "postgresql+asyncpg://soc:soc_password@localhost:5432/socdb"
+  pool_size: 10
+  max_overflow: 20
+
+connectors:
+  splunk:
+    enabled: true
+    host: "https://localhost:8089"
+    username: "admin"
+    password: "${SPLUNK_PASSWORD}"
+    index: "main"
+    poll_interval_seconds: 30
+    max_events_per_poll: 500
+
+  qradar:
+    enabled: true
+    host: "https://qradar.internal"
+    api_token: "${QRADAR_API_TOKEN}"
+    poll_interval_seconds: 30
+    max_offenses_per_poll: 200
+
+  wazuh:
+    enabled: true
+    host: "https://wazuh.internal"
+    username: "wazuh-wui"
+    password: "${WAZUH_PASSWORD}"
+    poll_interval_seconds: 15
+    max_alerts_per_poll: 1000
+
+api:
+  host: "0.0.0.0"
+  port: 8000
+  debug: false
+
+logging:
+  level: "INFO"
+  format: "json"
